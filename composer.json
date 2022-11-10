@@ -21,6 +21,9 @@
         "psr-4": {
             "ConfigIni\\": "src/"
         }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
     }
 }
 
