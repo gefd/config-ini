@@ -1,5 +1,7 @@
 # PHP Ini Configuration Loader/Class
 
+[![Build Status](https://img.shields.io/github/workflow/status/gefd/config-ini/Tests/main.svg)](https://github.com/gefd/config-ini/actions?query=branch:main)
+
 Usage given the contents of the example.ini file;
 ```php
 <?php
