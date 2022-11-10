@@ -65,7 +65,7 @@ Host specific configuration file: db01.config.ini
 type=postgresql
 ```
 
-This will produce a Config instance with the following;
+When the second argument to IniLoader::Load is passed as `true`, this will produce a Config instance with the following;
 ```php
 /*
     [
@@ -77,16 +77,16 @@ This will produce a Config instance with the following;
 */
 ```
 
-The IniLoader::Load method also accepts a second boolean parameter that will enable using a "local.[config-file-name].ini" configuration file that will
-be merged with the base configuration file.
+An optional additional "local.config.ini" file will also be loaded if it exists in this case. This can be used as an alternative to a host name
+prefixed configuration file.
 
-For example, using the IniLoader like the following;
-```php
-$config = IniLoader::Load("config.ini", true);
+The default behaviour is to only load configuration from the file name given as the first parameter.
+
+Separating configuration into default and host specific files allows the base config.ini file to be committed to source 
+control, and a host specific or local configuration that may include application secrets and passwords to be excluded from source control. 
+With a .gitignore entry like the following example;
+
 ```
-
-Will result in the loader loading and parsing the contents of `config.ini` if it exists, a host prefixed configuration file (eg; `db01.config.ini`)
-followed by adding `local.config.ini` if it exists.
-
-Local and hostname configuration files should be excluded from source control. 
+/*.config.ini
+```
 
