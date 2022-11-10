@@ -1,6 +1,6 @@
 # PHP Ini Configuration Loader/Class
 
-Usage;
+Usage given the contents of the example.ini file;
 ```php
 <?php
 
@@ -13,67 +13,51 @@ Usage;
     $config = IniLoader::Load('example.ini');
 
     // "ConfigIni\Config"
-    if ($config->get('config.name') !== "ConfigIni\Config") {
-        throw new \Exception('Failed.');
-    }
+    $config->get('config.name');
     // "https://github.com/gefd/config-ini"
-    if ($config->get('config.url') !== "https://github.com/gefd/config-ini") {
-        throw new \Exception('Failed.');
-    }
+    $config->get('config.url');
     // "example.ini"
-    if ($config->get('config.example') !== "example.ini") {
-        throw new \Exception('Failed.');
-    }
+    $config->get('config.example');
     // true
-    if ($config->get('config.boolean') !== true || !is_bool($config->get('config.boolean'))) {
-        throw new \Exception('Failed.');
-    }
+    $config->get('config.boolean');
     // 10
-    if ($config->get('config.integer') !== 10 || !is_int($config->get('config.integer'))) {
-        throw new \Exception('Failed.');
-    }
+    $config->get('config.integer');
     // 0.3
-    if ($config->get('config.float') !== 0.3 || !is_float($config->get('config.float'))) {
-        throw new \Exception('Failed.');
-    }
+    $config->get('config.float');
     // "first"
-    if ($config->get('config.child.first') !== 'first') {
-        throw new \Exception('Failed.');
-    }
+    $config->get('config.child.first');
     // "first child"
-    if ($config->get('config.child.child') !== 'first child') {
-        throw new \Exception('Failed.');
-    }
-    // Config([ first => 'first', 'child' => 'first child'])
-    $child = $config->get('config.child');
-    if (!($child instanceof Config)) {
-        throw new \Exception('Failed.');
-    }
+    $config->get('config.child.child');
+    // Config instance containing configuration from the 'config.child' path
+    $config->get('config.child');
+    // Config instance containing [ 'one' = 'first', 'two' => 'second' ]
+    $childConfig = $config->get('config.child.children');
+    // 'first'
+    $childConfig->get('one');
     // "first"
-    if ($child->get('first') !== 'first') {
-        throw new \Exception('Failed.');
-    }
+    $child->get('first') !== 'first');
     // "first child"
-    if ($child->get('child') !== 'first child') {
-        throw new \Exception('Failed.');
-    }
+    $child->get('child');
+    // ['first','second','third']
+    $child->get('config.child.second.children');
+    // 'first'
+    $child->get('config.child.second.children.0');
 
-    // missing configuration
-    if ($child->get('missing') !== null) {
-        throw new \Exception('Failed.');
-    }
+
+    // missing configuration values return null
+    $child->get('missing');
 ```
 
 The static IniLoader::Load method accepts a file name as the first parameter. This will attempt to also load and merge configuration from
 a configuration file named using the current host name as the prefix. For example, on a host named "db01", with the following configuration files;
 
-file: config.ini
+Primary configuration file: config.ini
 ```ini
 [db]
 type=sqlite
 name=example
 ```
-file: db01.config.ini
+Host specific configuration file: db01.config.ini
 ```ini
 [db]
 type=postgresql
