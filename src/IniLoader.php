@@ -48,6 +48,9 @@ class IniLoader
     {
         if (\is_numeric($key) || !self::hasSeparator($key)) {
             if (!\is_array($value)) {
+                if (\is_string($data)) {
+                    throw new \ErrorException("Configuration key '$key' overlaps with an existing key");
+                }
                 $data[$key] = $value;
             } else {
                 foreach ($value as $k => $v) {

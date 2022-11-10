@@ -31,7 +31,7 @@ class IniLoaderTest extends TestCase
         $config = IniLoader::FromArray($input);
         $actual = $config->getArray();
 
-        $this->assertEquals($expected, $actual, 'Incorrect result: ' . var_export($actual, true));
+        $this->assertEquals($expected, $actual, 'Incorrect result: ' . \var_export($actual, true));
     }
 
     public function testCreateKeyArrayMultipleFirstLevel()
@@ -49,7 +49,7 @@ class IniLoaderTest extends TestCase
         $expected = ['foo' => ['bar' => ['key' => ['pair' => 'value']]]];
         $config = IniLoader::FromArray($input);
         $actual = $config->getArray();
-        $this->assertEquals($expected, $actual, 'Incorrect result: ' . var_export($actual, true));
+        $this->assertEquals($expected, $actual, 'Incorrect result: ' . \var_export($actual, true));
     }
 
     public function testCreateMultipleLevels()
@@ -58,7 +58,7 @@ class IniLoaderTest extends TestCase
         $expected = ['foo' => ['bar' => ['baz' => 'value', 'quux' => 'value']]];
         $actual = IniLoader::FromArray($input)->getArray();
 
-        $this->assertEquals($expected, $actual, 'Incorrect result: ' . var_export($actual, true));
+        $this->assertEquals($expected, $actual, 'Incorrect result: ' . \var_export($actual, true));
     }
 
     public function testConfigArrays()
@@ -87,7 +87,7 @@ class IniLoaderTest extends TestCase
 
     public function testFromStringParsesDotFormat()
     {
-        $config = IniLoader::FromString(implode(\PHP_EOL, [
+        $config = IniLoader::FromString(\implode(\PHP_EOL, [
             '[one]',
             'two.three=3',
             'two.four=4',
@@ -107,7 +107,7 @@ class IniLoaderTest extends TestCase
 
     public function testFromStringParsesArrayFormat()
     {
-        $config = IniLoader::FromString(implode(\PHP_EOL, [
+        $config = IniLoader::FromString(\implode(\PHP_EOL, [
             '[one]',
             'two[]=2',
             'two[]="two"',
@@ -132,7 +132,7 @@ class IniLoaderTest extends TestCase
 
     public function testFromStringWithGroupDot()
     {
-        $config = IniLoader::FromString(implode(\PHP_EOL, [
+        $config = IniLoader::FromString(\implode(\PHP_EOL, [
             '[one.two]',
             'three=3'
         ]));
@@ -144,7 +144,7 @@ class IniLoaderTest extends TestCase
 
     public function testFromStringWithMultipleGroupDots()
     {
-        $config = IniLoader::FromString(implode(\PHP_EOL, [
+        $config = IniLoader::FromString(\implode(\PHP_EOL, [
             '[first.one]',
             'two=3',
             '[first.two]',
@@ -159,7 +159,7 @@ class IniLoaderTest extends TestCase
 
     public function testFromStringWithAddedGroupDot()
     {
-        $config = IniLoader::FromString(implode(\PHP_EOL, [
+        $config = IniLoader::FromString(\implode(\PHP_EOL, [
             '[first]',
             'one=2',
             '[first.two]',
@@ -170,5 +170,42 @@ class IniLoaderTest extends TestCase
         $this->assertEquals(2, $config->get('first.one'));
         $this->assertEquals(4, $config->get('first.two.three'));
         $this->assertEquals($expected, $config->getArray());
+    }
+
+    public function testGroupDotOverlapsChildDot()
+    {
+        $config = IniLoader::FromString(\implode(\PHP_EOL, [
+            '[first.one]',
+            'one.one=1'
+        ]));
+        $this->assertEquals(1, $config->get('first.one.one.one'));
+    }
+
+    public function testChildDotOverlapsOtherChild()
+    {
+        $this->expectException(\ErrorException::class);
+        $config = IniLoader::FromString(\implode(\PHP_EOL, [
+            '[first]',
+            'one=1',
+            'one.two=1'
+        ]));
+        // ErrorException should have been thrown due to overlapping keys
+        $this->fail();
+    }
+
+    public function testChildArray()
+    {
+        $config = IniLoader::FromString(\implode(\PHP_EOL, [
+            '[first]',
+            'one.two[]=1',
+            'one.two[]=2',
+            'one.two[]=3'
+        ]));
+        $this->assertEquals([1,2,3], $config->get('first.one.two'));
+        $this->assertEquals(1, $config->get('first.one.two.0'));
+        $this->assertInstanceOf(Config::class, $config->get('first.one'));
+        $children = $config->get('first.one');
+        $this->assertEquals([1,2,3], $children->get('two'));
+        $this->assertEquals(1, $children->get('two.0'));
     }
 }
