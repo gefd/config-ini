@@ -11,6 +11,16 @@ use ConfigIni\Config;
 
 class IniLoaderTest extends TestCase
 {
+    public function testLoadExample()
+    {
+        $config = IniLoader::Load(dirname(__DIR__) . '/example.ini', false);
+        $this->assertInstanceOf(Config::class, $config);
+        $config = IniLoader::Load(dirname(__DIR__) . '/example.ini', true);
+        $this->assertInstanceOf(Config::class, $config);
+        $this->expectException(\RuntimeException::class);
+        $config = IniLoader::Load("./missing-config.ini");
+        $this->fail("Expected exception not thrown for missing configuration file");
+    }
     public function testBasicArray()
     {
         $config = IniLoader::FromArray([
