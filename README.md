@@ -36,18 +36,17 @@ Usage given the contents of the example.ini file;
     $childConfig = $config->get('config.child.children');
     // 'first'
     $childConfig->get('one');
-    // "first"
-    $child->get('first') !== 'first');
-    // "first child"
-    $child->get('child');
+    // 'second'
+    $childConfig->get('two');
+
     // ['first','second','third']
-    $child->get('config.child.second.children');
+    $config->get('config.child.second.children');
     // 'first'
-    $child->get('config.child.second.children.0');
+    $config->get('config.child.second.children.0');
 
 
     // missing configuration values return null
-    $child->get('missing');
+    $config->get('missing');
 ```
 
 The static IniLoader::Load method accepts a file name as the first parameter. This will attempt to also load and merge configuration from
